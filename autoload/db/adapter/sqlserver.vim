@@ -51,7 +51,10 @@ function! db#adapter#sqlserver#interactive(url) abort
         \ (has_key(url, 'user') ? [] : ['-E']) +
         \ db#url#as_argv(url, '', '', '', '-U ', '', '-d ')
   else 
-  return ['$Env:SQLCMDPASSWORD=' . get(url, 'password', ''), 'sqlcmd', '-S', s:server(url)] +
+let sqlcmdpassword = get(url, 'password', '')
+let set_env_cmd = 'export SQLCMDPASSWORD=' . sqlcmdpassword
+call system(set_env_cmd)
+return ['sqlcmd', '-S', s:server(url)] +
         \ (empty(encrypt) ? [] : ['-N'] + (encrypt ==# '1' ? [] : [url.params.encrypt])) +
         \ s:boolean_param_flag(url, 'trustServerCertificate', '-C') +
         \ (has_key(url, 'user') ? [] : ['-E']) +
